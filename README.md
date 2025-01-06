@@ -1,6 +1,8 @@
 # auto-reel-edit
 
-Enhance your 9:16 reels with Sieve! Replace backgrounds seamlessly and add captivating captions to make your reels stand out.
+Enhance your 9:16 reels with [Sieve](https://www.sievedata.com/)! Replace backgrounds seamlessly and add captivating captions to make your reels stand out.
+
+https://github.com/user-attachments/assets/8760da42-6d8f-4bc7-bb8a-c298bdba13c2
 
 This Sieve pipeline transforms a 9:16 reel into an eye-catching, captioned video optimized for maximum engagement. It includes the following steps:
 
@@ -10,7 +12,7 @@ This Sieve pipeline transforms a 9:16 reel into an eye-catching, captioned video
 
 ## Tutorial
 
-A detailed explanation of the pipeline is provided in this [tutorial](https://www.sievedata.com).
+A detailed explanation of the pipeline is provided in this [tutorial](https://sievedata.com/blog/automated-background-and-caption-effects-pipeline).
 
 ## Options
 
