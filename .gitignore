@@ -1,0 +1,7 @@
+reel_venv
+samples
+__pycache__
+
+captions/node_modules/
+captions/public/*.mp4
+captions/out/*.mp4
