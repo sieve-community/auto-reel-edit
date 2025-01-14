@@ -8,6 +8,38 @@ import requests
 from crop_background import crop_image_vertical, crop_video_vertical
 from transcript import get_duration, get_fps, prepare_transcript_word_list, prepare_transcript_words_list
 
+def start_remotion_server(command, target_message):
+    """
+    Starts a remotion server process and and once server starts running returns the process.
+    """
+    try:
+        # Start the server process
+        server_process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+    
+        if not server_process.stdout:
+            raise RuntimeError("Failed to capture subprocess output streams.")
+        
+        # Monitor the output for the target message
+        while True:
+            output = server_process.stdout.readline()
+            if output == "" and server_process.poll() is not None:
+                raise RuntimeError("Server process exited unexpectedly.")
+            if target_message in output:
+                print("Server Outputs:", output.strip())
+                break
+            print(output, end="")
+
+        return server_process
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
 SubtitleOptions = Literal["glowing", "background_tracking", "color_tracking", "typing_background"]
 
 metadata = sieve.Metadata(
@@ -61,11 +93,21 @@ def auto_reel_edit(
 
     original_directory = os.getcwd()
     os.chdir("captions")
-    subprocess.run(["npm", "i"])
-    subprocess.Popen(["node", "server.js"])
-    print("Remotion server started and running in the background")
-    os.chdir(original_directory)
 
+    """
+    Run `npm i` to install packages and start the remotion server with `node server.js`.
+    Ensure it's fully running before sending a POST request to the Remotion server.    
+    These commands can be run asynchronously if you can ensure the server starts before the POST request to it is made.
+    """
+
+    npm_process = subprocess.Popen(["npm", "i"]) # asynchronous
+    npm_process.wait() # Makes it synchronous
+    print("NPM install completed")
+
+    server_process = start_remotion_server(["node", "server.js"], "Server is running!")
+    print("Remotion server started and running in the background")
+
+    os.chdir(original_directory)
     transcribe = sieve.function.get("sieve/transcribe")
     background_removal = sieve.function.get("sieve/background-removal")
 
@@ -121,11 +163,10 @@ def auto_reel_edit(
         "subtitle_type" : subtitle_type,       
     }
 
-    # Move the background changed video to remotion public folder for captioning
     remotion_folder = 'captions'
-    remotion_public_folder = f"{remotion_folder}/public/"
-    os.makedirs(remotion_public_folder, exist_ok=True)
-    shutil.move(background_removal_output_object.path, remotion_public_folder)
+    remotion_bundle_folder = f"{remotion_folder}/bundle/public/"
+    os.makedirs(remotion_bundle_folder, exist_ok=True)
+    shutil.move(background_removal_output_object.path, remotion_bundle_folder)
     
     # Make post request to remotion server
     headers = {
