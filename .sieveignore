@@ -6,3 +6,5 @@ captions/node_modules/
 captions/public/*.mp4
 captions/out/*.mp4
 TEST.mp4
+
+deploy_personalized.py
